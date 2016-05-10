@@ -1,0 +1,32 @@
+From 0a940c326b61fd086ef9eab8a40cfe75c1e11c40 Mon Sep 17 00:00:00 2001
+From: Daniel Johnson <hexahedria@gmail.com>
+Date: Sun, 4 Oct 2015 14:13:00 -0700
+Subject: [PATCH 02/12] Make qemu print on IO access
+
+---
+ memory.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/memory.c b/memory.c
+index 4eb138a..94870e6 100644
+--- a/memory.c
++++ b/memory.c
+@@ -399,6 +399,7 @@ static MemTxResult  memory_region_read_accessor(MemoryRegion *mr,
+     tmp = mr->ops->read(mr->opaque, addr, size);
+     trace_memory_region_ops_read(mr, addr, tmp, size);
+     *value |= (tmp & mask) << shift;
++    printf("IO_ACTION: Reading 0x%x from 0x%x\n", (unsigned int)tmp, (unsigned int)mr->addr+(unsigned int)addr);
+     return MEMTX_OK;
+ }
+ 
+@@ -448,6 +449,7 @@ static MemTxResult memory_region_write_accessor(MemoryRegion *mr,
+     tmp = (*value >> shift) & mask;
+     trace_memory_region_ops_write(mr, addr, tmp, size);
+     mr->ops->write(mr->opaque, addr, tmp, size);
++    printf("IO_ACTION: Writing 0x%x to 0x%x\n", (unsigned int)tmp, (unsigned int)mr->addr+(unsigned int)addr);
+     return MEMTX_OK;
+ }
+ 
+-- 
+1.9.1
+
