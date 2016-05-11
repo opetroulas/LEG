@@ -1,0 +1,66 @@
+\documentclass[12pt,letterpaper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\hyphenation{Model-Sim}
+
+\begin{document}
+
+\title{LEG Processor for Education\\\Large{System Documentation}
+}
+\author{Contact: \\Max Waugaman (mwaugaman@hmc.edu) \\Sam Dietrich (sdietrich@hmc.edu)}
+\date{Last Modified \today}
+\maketitle
+\thispagestyle{empty}
+\pagebreak
+\setcounter{page}{1}
+\pagebreak
+
+\tableofcontents
+\pagebreak
+
+\section{Getting Started}
+\input{tex/installation.tex}
+
+\section{Basic Testing}
+\input{tex/testing.tex}
+\pagebreak
+
+\section{Advanced Testing and Simulator Operation}
+\input{tex/debug_lockstep.tex}
+\pagebreak
+
+\section{LEG Processor Overview}
+\input{tex/leg.tex}
+
+\section{Datapath}
+\input{tex/datapath.tex}
+
+\section{Controller}
+\input{tex/controller.tex}
+
+\section{Hazard Unit}
+\input{tex/hazard.tex}
+
+%\section{Exception Handler}
+%\input{tex/exh.tex}
+
+\section{Data Cache} \label{sec:dcache}
+\input{tex/data_cache.tex}
+\pagebreak
+
+\section{Instruction Cache} \label{sec:icache}
+\input{tex/instr_cache.tex}
+\pagebreak
+
+
+\end{document}

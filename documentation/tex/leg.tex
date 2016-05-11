@@ -1,0 +1,61 @@
+This section presents an overview of the LEG processor, including the instruction set and memory architecture.
+LEG has a five stage pipeline with Fetch, Decode, Execute, Memory, and Writeback stages.
+Most control logic is implemented in the decode stage, and conditional execution is checked in the execute stage.
+
+\subsection{Instruction Set}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{./diagrams/datapath_simple.pdf}
+\caption{LEG processor core overview. More detailed diagrams are shown in the relevant sections below.}
+\label{fig:core}
+\end{figure}
+
+
+LEG supports a subset of the ARMv5 instruction set. 
+Known exceptions are the entire Thumb instruction set, LDM(2), and the rotate functionality of memory instructions.
+The rotate functionality is not implemented because it appears to be unsupported in the version of qemu used to debug LEG.
+All other addressing modes and instructions are supported, and any bugs that are discovered can be reported to the corresponding authors listed on the first page of this document.
+
+The processor core is split into three main components.
+The datapath contains the register file and hardware to execute arithmetic and memory operations, the controller sets multiplexers and other datapath control signals to create the specific behavior of each instruction, and the hazard unit detects dependencies between instructions and stalls the pipeline to resolve them.
+A simplified overview of the processor core is summarized in Figure \ref{fig:core}.
+More information about these subsystems can be found in later sections.
+The datapath is described in Section \ref{sec:dp}, the controller in Section \ref{sec:c} and the hazard unit in Section \ref{sec:h}.
+
+The full processor core diagram is shown in Figure \ref{fig:pipelinedfull} and is also included as a high quality PDF in the \texttt{documentation/diagrams} directory.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{./diagrams/pipelinedfull.pdf}
+\caption{LEG pipeline showing datapath (black), controller (blue), hazard unit (red), and a register file decoder also called the addresspath (green). A high resolution PDF is included in the diagrams directory.}
+\label{fig:pipelinedfull}
+\end{figure}
+
+\subsection{Memory System}
+The memory system includes L1 instruction and data
+caches, a TLB, and corresponding address translation hardware shown in \ref{fig:mem}. The bus connecting the peripherals, translation hardware, and caches is compatible with the AHB-Lite protocol, but does not implement burst mode, protection control, or HRESP.
+Descriptions of several of the caches can be found in sections \ref{sec:dcache} and \ref{sec:icache}.
+%It is useful to track memory acesses for testing the debugging the memory system.
+%If an error has occurred, then it is only detected once the incorrect value is read into a register.
+%For this reason, debugging statements have been added to \texttt{testbench.sv} to allow memory access recording.
+
+\begin{figure}[h!]
+\centering
+% TODO: update this with pdf image
+\includegraphics[width=\textwidth]{./diagrams/memSys.png}
+\caption{Memory system including physically tagged caches, address trans-
+lation hardware, and bus. The translation walk hardware (TWH), data and
+instruction cache all desire access to the bus (right). The AHB-Arbiter
+arbitrates bus control among those three modules. Instead of using two TLBS,
+one for each cache, one (top left) is shared among the instruction cache and
+data cache to conserve space. Similar to the AHB-Arbiter, the TLB arbiter
+mediates control over the TLB request and ready signals.}
+\label{fig:mem}
+\end{figure}
+
+\subsection{Exception and Interrupt Handler}
+
+The LEG interrupt handler supports all exception types and privileged modes with the Base Restored Abort Model.
+The interrupt handler is implemented as a finite state machine in \texttt{leg\_pipelined/exception\_handler.sv}.
+This state machine stalls the correct pipeline stages and controls the datapath to branch to the corresponding exception vector.
+More information about the exception handler can be found in Section \ref{sec:exh}

@@ -1,0 +1,90 @@
+This section describes the basic procedure for generating and running tests. 
+It covers running a provided test, useful GDB commands, and compiling handwritten tests.
+
+% TODO: Fill out these sections
+\subsection{Relevant Files}
+\begin{itemize}
+\item \textbf{debug\_lockstep/debug.sh} The entry point for the debugging framework. 
+\item \textbf{debug\_lockstep/unitTests/*} Randomized tests for every instruction. 
+Each test is named with the instruction or instruction type followed by the number of instructions in the test. 
+Each test has four or five files
+\begin{itemize}
+\item \texttt{test.s}, the randomly generated assembly.
+\item\texttt{test.dat}, the corresponding hexadecimal machine code.
+\item \texttt{test.dump}, the disassembled machine code.
+\item \texttt{test.elf} (optional), which contains information about how interrupts are raised in exception handler tests.
+\item \texttt{test.bin}, the binary file that runs on the processor and QEMU.
+\end{itemize}
+
+\item \textbf{debug\_lockstep/customTests/compileTest.sh} Script for compiling tests for LEG from assembly source. See Section \ref{sec:maketest}.
+
+\item \textbf{debug\_lockstep/customTests/makeRandomAssembly.py} Script to generate random assembly instructions to test on LEG. See Section \ref{sec:randasm}.
+\end{itemize}
+
+\subsection{Basic Operation on Provided Tests}
+This section demonstrates the most basic operation of the testing framework.
+It will allow you to run a test from the terminal and debug in gdb at a register and instruction level.
+\begin{enumerate}
+\item From your local copy of the LEG repository, enter the \texttt{debug\_lockstep} directory.
+\item Provided tests are stored in the \texttt{unitTests} directory. 
+ To run a provided test, type 
+ \begin{verbatim}./debug.sh -t unitTests/testname.bin\end{verbatim}
+ at the terminal. For example, to run the test consisting of 1000 random \texttt{ADC} instructions, enter 
+ \begin{verbatim}./debug.sh -t unitTests/adc_1000.bin\end{verbatim}
+\item LEG will now be compiled by ModelSim and instances of QEMU and GDB will be started.
+ If there are no compilation errors, you will be at the prompt of gdb modified with LEG-specific debugging commands.
+ Many of these are explained further in Section \ref{sec:leggdb}
+ 
+ The most basic command is \texttt{leg-lockstep}, which runs LEG until a bug is found.
+ Enter this now.
+\item The test will print a `\texttt{.}' after each successfully executed instruction.
+ If the program completes successfully, a \texttt{PASSED} message will appear.
+ Otherwise debugging information will be printed, including the last correct register state, the current incorrect LEG register state, and the expected register state.
+\item Debug with any GDB command, or type \texttt{leg-stop} to exit.
+\end{enumerate}
+
+This guide cannot present a complete tutorial on using GDB, but a few examples of the most useful commands are listed in Table \ref{table:gdb} below.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|p{10cm}|}
+\hline \textbf{command} & \textbf{effect} \\ 
+\hline \texttt{stepi} & Execute one instruction \\ 
+\hline \texttt{i r} & Print register contents of the current mode, including cpsr \\ 
+\hline \texttt{x/10i \$pc} & Print the next 10 instructions \\ 
+\hline \texttt{x/10w \$sp-20} & Print 10 words of memory, starting 20 addresses below the stack pointer \\ 
+\hline \texttt{x/5b 0xfffdc} & Print 5 bytes of memory, starting at \texttt{0xfffdc} \\ 
+\hline \texttt{b *0x220} & Set a breakpoint at address \texttt{0x220} \\ 
+\hline 
+\end{tabular} 
+\caption{Examples of common GDB commands}
+\label{table:gdb}
+\end{table}
+
+\subsection{Creating Tests}
+Custom tests can be created from Assembly source and run on LEG using the tools in \texttt{debug\_lockstep/customTests}.
+
+\subsubsection{Generating Assembly}\label{sec:randasm}
+The script \texttt{makeRandomAssembly.py} can be used to easily create random instructions to test LEG with a vast combination of cases.
+Because interrupt handlers, a small stack, and all processor modes are automatically initialized, the output of the script can also be extended with your own additional test vectors.
+For example, to create 1234 random add and load instructions and output the program to \texttt{add\_load.s}, run
+\begin{verbatim}python makeRandomAssembly.py -i add ldr -n 1234 > add_load.s\end{verbatim}
+Run the script with \texttt{-h} to print full usage info.
+
+NOTE: Sometimes immediates produced by the script are not recognized by the compiler. 
+In these cases you must re-run \texttt{makeRandomAssembly.py} or manually change the immediate value that fails compilation.
+
+\subsubsection{Compiling Assembly}\label{sec:maketest}
+Any assembly code compatible with ARMv5 excluding Thumb can tested on LEG.
+Compiling the code uses the ARM bare metal development toolchain that was previously installed in Section \ref{sec:install}.
+Simply run \texttt{compileTest.sh} in \texttt{debug\_lockstep/customTests} with the basename of the assembly code you want to compile. Note that the \texttt{.s} extension is not included.
+
+\begin{verbatim}./compileTest.sh add_load\end{verbatim}
+
+The compiled files will be placed in the \texttt{tests} directory. 
+The test can now be run on LEG from \texttt{debug\_lockstep}:
+
+\begin{verbatim}./debug.sh -t customTests/tests/add_load.bin\end{verbatim}
+
+\subsection{Debugging Tools}
+
