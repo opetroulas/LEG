@@ -42,9 +42,8 @@ Descriptions of several of the caches can be found in sections \ref{sec:dcache} 
 \begin{figure}[h!]
 \centering
 % TODO: update this with pdf image
-\includegraphics[width=\textwidth]{./diagrams/memSys.png}
-\caption{Memory system including physically tagged caches, address trans-
-lation hardware, and bus. The translation walk hardware (TWH), data and
+\includegraphics[width=\textwidth]{./diagrams/mmu.pdf}
+\caption{Memory system including physically tagged caches, address translation hardware, and bus. The translation walk hardware (TWH), data and
 instruction cache all desire access to the bus (right). The AHB-Arbiter
 arbitrates bus control among those three modules. Instead of using two TLBS,
 one for each cache, one (top left) is shared among the instruction cache and
