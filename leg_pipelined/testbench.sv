@@ -35,7 +35,7 @@ module testbench();
   real DMIPS;
 
   // This line is used to turn on or off profiling
-  `define PROFILE
+  `define PROFILE 1
   
   // profiling variables
   real totalCycles = 0;
