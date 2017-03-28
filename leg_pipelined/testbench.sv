@@ -299,6 +299,7 @@ module testbench();
 
   //----------------------------- BEGIN PROFILING ---------------------------
   `ifdef PROFILE
+    $display("We made it here")
   
     always @(posedge dut.leg.h.PCWrPendingF)
     begin
