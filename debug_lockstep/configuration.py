@@ -3,7 +3,7 @@
 
 # qemu_path="/proj/leg/debugutils/qemu/arm-softmmu/qemu-system-arm"
 # gdb_path="/proj/leg/debugutils/gcc-arm-none-eabi-4_9-2015q1/bin"
-qemu_path="/legproj/qemu/arm-softmmu/qemu-system-arm"
-gdb_path="/legproj/gcc-arm-none-eabi-5_3-2016q1/bin"
+qemu_path="/home/mitll/Documents/LEG/qemu/arm-softmmu/qemu-system-arm"
+gdb_path="/home/mitll/Documents/legproj/gcc-arm-none-eabi-5_4-2016q3/bin"
 linux_path="../kernel/"
 hasVopt=0
